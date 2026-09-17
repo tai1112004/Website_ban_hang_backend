@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: robotstore
+
+  profiles:
+    active: dev

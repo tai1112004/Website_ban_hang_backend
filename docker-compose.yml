@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: robotstore-mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: robotstore
+      MYSQL_USER: robotuser
+      MYSQL_PASSWORD: robotpass
+
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - robotstore_mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    restart: unless-stopped
+
+volumes:
+  robotstore_mysql_data:

@@ -1,0 +1,54 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: robotstore
+          MYSQL_USER: robotuser
+          MYSQL_PASSWORD: robotpass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Grant execute permission for Maven Wrapper
+        run: chmod +x mvnw
+
+      - name: Build and test
+        run: ./mvnw clean verify
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/robotstore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
+          SPRING_DATASOURCE_USERNAME: robotuser
+          SPRING_DATASOURCE_PASSWORD: robotpass
